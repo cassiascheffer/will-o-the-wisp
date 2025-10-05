@@ -1,24 +1,9 @@
-# willow_camp
+# willow.camp v2
 
-[![Package Version](https://img.shields.io/hexpm/v/willow_camp)](https://hex.pm/packages/willow_camp)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/willow_camp/)
+[willow.camp](https://willow.camp) is a minimalist blogging platform. I wrote the first version of willow.camp in Rails with all the tools that framework comes with. 
 
-```sh
-gleam add willow_camp@1
-```
-```gleam
-import willow_camp
+willow.camp v2 is a re-write of the same platform using Gleam , Wisp, and packages from the Gleam ecosystem. 
 
-pub fn main() -> Nil {
-  // TODO: An example of the project in use
-}
-```
+## The Name
 
-Further documentation can be found at <https://hexdocs.pm/willow_camp>.
-
-## Development
-
-```sh
-gleam run   # Run the project
-gleam test  # Run the tests
-```
+willow.camp is named after a playful and curious dog, Willow. Willow's full name is Will-o-the-Wisp. So of course, when I saw the Wisp framework, I knew the repo for this project had to be named `will-o-the-wisp`.
