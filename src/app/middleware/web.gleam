@@ -1,3 +1,4 @@
+import app/middleware/wc_blog_header
 import exception
 import gleam/int
 import wisp
@@ -12,6 +13,7 @@ pub fn middleware(
   use <- log_errors
   use req <- wisp.handle_head(req)
   use req <- wisp.csrf_known_header_protection(req)
+  use req <- wc_blog_header.middleware(req)
 
   handle_request(req)
 }
