@@ -1,7 +1,4 @@
-// ABOUTME: Middleware for extracting subdomain from Host header
-// ABOUTME: Sets x-wc-blog header when a subdomain is detected
 import gleam/http/request
-import gleam/option
 import gleam/result
 import gleam/string
 import wisp
@@ -27,9 +24,10 @@ fn get_subdomain(req: wisp.Request) -> Result(String, Nil) {
     [] -> host
   }
 
-  // Check if it matches *.willow.camp pattern
+  // Check if it matches *.willow.camp or *.localhost pattern
   case string.split(host, ".") {
     [subdomain, "willow", "camp"] if subdomain != "www" -> Ok(subdomain)
+    [subdomain, "localhost"] if subdomain != "www" -> Ok(subdomain)
     _ -> Error(Nil)
   }
 }

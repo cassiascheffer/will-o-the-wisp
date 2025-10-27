@@ -1,7 +1,7 @@
 // ABOUTME: Renders individual blog post pages
 // ABOUTME: Displays post title, metadata, and body content
-import app/models/blog.{type Blog}
-import app/models/post.{type Post}
+import app/blog.{type Blog}
+import app/post.{type Post}
 import gleam/option.{None, Some}
 import lustre/attribute
 import lustre/element.{type Element}

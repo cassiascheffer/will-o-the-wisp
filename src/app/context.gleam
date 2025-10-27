@@ -1,4 +1,4 @@
-import app/models/blog.{type Blog}
+import app/blog.{type Blog}
 import gleam/option.{type Option}
 import pog
 

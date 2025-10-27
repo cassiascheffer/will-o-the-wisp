@@ -1,5 +1,3 @@
-// ABOUTME: Defines the Post model and database queries for blog posts
-// ABOUTME: Handles querying posts by id, slug, and blog_id from the database
 import cake/adapter/postgres
 import cake/select as s
 import cake/where as w
@@ -7,6 +5,8 @@ import gleam/dynamic/decode
 import gleam/option.{type Option}
 import gleam/result
 import pog
+
+// ---- Types ----
 
 pub type Post {
   Post(
@@ -30,6 +30,8 @@ pub type PostError {
   NotFound
   DatabaseError(pog.QueryError)
 }
+
+// ---- Decoder ----
 
 pub fn decoder() {
   use id <- decode.field(0, decode.string)
@@ -61,6 +63,8 @@ pub fn decoder() {
     updated_at: updated_at,
   ))
 }
+
+// ---- Database Queries ----
 
 pub fn get_by_id(db: pog.Connection, id: String) -> Result(Post, PostError) {
   let query =

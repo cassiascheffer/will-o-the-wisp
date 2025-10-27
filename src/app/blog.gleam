@@ -1,5 +1,3 @@
-// ABOUTME: Defines the Blog model and database queries for blogs
-// ABOUTME: Handles querying blogs by user_id, subdomain, and id from the database
 import cake/adapter/postgres
 import cake/select as s
 import cake/where as w
@@ -7,6 +5,8 @@ import gleam/dynamic/decode
 import gleam/option
 import gleam/result
 import pog
+
+// ---- Types ----
 
 pub type Blog {
   Blog(
@@ -25,6 +25,8 @@ pub type BlogError {
   NotFound
   DatabaseError(pog.QueryError)
 }
+
+// ---- Decoder ----
 
 pub fn decoder() {
   use id <- decode.field(0, decode.string)
@@ -47,6 +49,8 @@ pub fn decoder() {
   ))
 }
 
+// ---- Database Queries ----
+
 pub fn get_by_user_id(
   db: pog.Connection,
   user_id: String,
@@ -62,7 +66,7 @@ pub fn get_by_user_id(
       s.col("custom_domain"),
       s.col("theme"),
       s.col("post_footer_markdown"),
-      s.col("\"primary\""),
+      s.col("primary_blog"),
     ])
     |> s.where(w.eq(w.col("user_id::uuid"), w.string(user_id)))
     |> s.to_query
@@ -86,7 +90,7 @@ pub fn get_by_subdomain(
       s.col("custom_domain"),
       s.col("theme"),
       s.col("post_footer_markdown"),
-      s.col("\"primary\""),
+      s.col("primary_blog"),
     ])
     |> s.where(w.eq(w.col("subdomain"), w.string(subdomain)))
     |> s.to_query
@@ -113,7 +117,7 @@ pub fn get_by_id(db: pog.Connection, id: String) -> Result(Blog, BlogError) {
       s.col("custom_domain"),
       s.col("theme"),
       s.col("post_footer_markdown"),
-      s.col("\"primary\""),
+      s.col("primary_blog"),
     ])
     |> s.where(w.eq(w.col("id::uuid"), w.string(id)))
     |> s.to_query

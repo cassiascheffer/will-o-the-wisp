@@ -1,7 +1,7 @@
 // ABOUTME: Renders blog homepage with list of posts
 // ABOUTME: Displays blog title and published posts
-import app/models/blog.{type Blog}
-import app/models/post.{type Post}
+import app/blog.{type Blog}
+import app/post.{type Post}
 import gleam/list
 import gleam/option.{None, Some}
 import lustre/attribute

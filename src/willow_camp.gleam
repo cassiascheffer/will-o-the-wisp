@@ -39,7 +39,10 @@ pub fn main() {
     |> mist.port(web_port)
     |> mist.start
 
-  io.println("Server started successfully - listening on http://127.0.0.1:8000")
+  io.println(
+    "Server started successfully - listening on http://127.0.0.1:"
+    <> int.to_string(web_port),
+  )
 
   process.sleep_forever()
 }
