@@ -11,12 +11,12 @@ import wisp.{type Request, type Response}
 pub fn show(
   req: Request,
   ctx: Context,
-  blog_id: String,
+  subdomain: String,
   slug: String,
 ) -> Response {
   use <- wisp.require_method(req, http.Get)
 
-  case post_and_blog.fetch_post_with_blog(ctx.db, blog_id, slug) {
+  case post_and_blog.fetch_post_with_blog_by_subdomain(ctx.db, subdomain, slug) {
     Ok(data) -> {
       case data.post.published {
         True -> {
