@@ -44,7 +44,7 @@ fn render_user_page(user: User, blogs: List(Blog)) -> String {
   layout.render(user.name, content)
 }
 
-pub fn get_user(req: Request, ctx: Context, id: String) -> Response {
+pub fn one(req: Request, ctx: Context, id: String) -> Response {
   use <- wisp.require_method(req, http.Get)
 
   case fetch_user_data(ctx.db, id) {
