@@ -31,6 +31,7 @@ fn fetch_user_data(
     blog.get_by_user_id(db, id)
     |> result.map_error(fn(err) {
       case err {
+        blog.NotFound -> DbError(pog.ConnectionUnavailable)
         blog.DatabaseError(db_error) -> DbError(db_error)
       }
     }),

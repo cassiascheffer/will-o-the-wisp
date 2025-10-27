@@ -1,5 +1,8 @@
 // ABOUTME: Defines the Blog model and database queries for blogs
-// ABOUTME: Handles querying blogs by user_id from the database
+// ABOUTME: Handles querying blogs by user_id, subdomain, and id from the database
+import cake/adapter/postgres
+import cake/select as s
+import cake/where as w
 import gleam/dynamic/decode
 import gleam/option
 import gleam/result
@@ -19,6 +22,7 @@ pub type Blog {
 }
 
 pub type BlogError {
+  NotFound
   DatabaseError(pog.QueryError)
 }
 
@@ -47,22 +51,79 @@ pub fn get_by_user_id(
   db: pog.Connection,
   user_id: String,
 ) -> Result(List(Blog), BlogError) {
-  let sql =
-    "SELECT
-      id::text,
-      user_id::text,
-      subdomain,
-      title,
-      custom_domain,
-      theme,
-      post_footer_markdown,
-      \"primary\"
-    FROM blogs WHERE user_id = $1::uuid"
+  let query =
+    s.new()
+    |> s.from_table("blog_configs")
+    |> s.selects([
+      s.col("id::text"),
+      s.col("user_id::text"),
+      s.col("subdomain"),
+      s.col("title"),
+      s.col("custom_domain"),
+      s.col("theme"),
+      s.col("post_footer_markdown"),
+      s.col("\"primary\""),
+    ])
+    |> s.where(w.eq(w.col("user_id::uuid"), w.string(user_id)))
+    |> s.to_query
 
-  pog.query(sql)
-  |> pog.parameter(pog.text(user_id))
-  |> pog.returning(decoder())
-  |> pog.execute(db)
-  |> result.map(fn(response) { response.rows })
+  postgres.run_read_query(query, decoder(), db)
   |> result.map_error(DatabaseError)
+}
+
+pub fn get_by_subdomain(
+  db: pog.Connection,
+  subdomain: String,
+) -> Result(Blog, BlogError) {
+  let query =
+    s.new()
+    |> s.from_table("blog_configs")
+    |> s.selects([
+      s.col("id::text"),
+      s.col("user_id::text"),
+      s.col("subdomain"),
+      s.col("title"),
+      s.col("custom_domain"),
+      s.col("theme"),
+      s.col("post_footer_markdown"),
+      s.col("\"primary\""),
+    ])
+    |> s.where(w.eq(w.col("subdomain"), w.string(subdomain)))
+    |> s.to_query
+
+  postgres.run_read_query(query, decoder(), db)
+  |> result.map_error(DatabaseError)
+  |> result.try(fn(blogs) {
+    case blogs {
+      [blog, ..] -> Ok(blog)
+      [] -> Error(NotFound)
+    }
+  })
+}
+
+pub fn get_by_id(db: pog.Connection, id: String) -> Result(Blog, BlogError) {
+  let query =
+    s.new()
+    |> s.from_table("blog_configs")
+    |> s.selects([
+      s.col("id::text"),
+      s.col("user_id::text"),
+      s.col("subdomain"),
+      s.col("title"),
+      s.col("custom_domain"),
+      s.col("theme"),
+      s.col("post_footer_markdown"),
+      s.col("\"primary\""),
+    ])
+    |> s.where(w.eq(w.col("id::uuid"), w.string(id)))
+    |> s.to_query
+
+  postgres.run_read_query(query, decoder(), db)
+  |> result.map_error(DatabaseError)
+  |> result.try(fn(blogs) {
+    case blogs {
+      [blog, ..] -> Ok(blog)
+      [] -> Error(NotFound)
+    }
+  })
 }
