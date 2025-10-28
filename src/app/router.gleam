@@ -35,9 +35,9 @@ fn handle_blog_index(req: Request, ctx: Context, subdomain: String) -> Response 
   case queries.fetch_blog_with_posts_by_subdomain(ctx.db, subdomain) {
     Ok(data) -> {
       let content = blog_view.render_blog_index(data.blog, data.posts)
-      let html = element.to_string(content)
-      let page = layout.render(data.blog.title, html)
-      wisp.html_response(page, 200)
+      let page = layout.render(data.blog.title, content)
+      let html = element.to_string(page)
+      wisp.html_response(html, 200)
     }
     Error(queries.BlogNotFound) -> wisp.not_found()
     Error(queries.BlogDatabaseError(db_error)) -> {
@@ -64,9 +64,9 @@ fn handle_post_show(
       case data.post.published {
         True -> {
           let content = post_view.render_post(data.post, data.blog)
-          let html = element.to_string(content)
-          let page = layout.render(data.post.title, html)
-          wisp.html_response(page, 200)
+          let page = layout.render(data.post.title, content)
+          let html = element.to_string(page)
+          wisp.html_response(html, 200)
         }
         False -> wisp.not_found()
       }

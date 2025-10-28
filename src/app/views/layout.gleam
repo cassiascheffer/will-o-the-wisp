@@ -1,16 +1,27 @@
 // ABOUTME: Provides the main HTML layout structure for all pages
 // ABOUTME: Handles rendering the full HTML document with head and body elements
 
-pub fn render(title: String, content: String) -> String {
-  "<!DOCTYPE html>
-<html lang=\"en\">
-<head>
-  <meta charset=\"UTF-8\">
-  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-  <title>"
-  <> title
-  <> "</title>
-  <style>
+import lustre/attribute
+import lustre/element.{type Element}
+import lustre/element/html
+
+pub fn render(title: String, content: Element(a)) -> Element(a) {
+  html.html([attribute.attribute("lang", "en")], [
+    html.head([], [
+      html.meta([attribute.attribute("charset", "UTF-8")]),
+      html.meta([
+        attribute.name("viewport"),
+        attribute.attribute("content", "width=device-width, initial-scale=1.0"),
+      ]),
+      html.title([], title),
+      html.style([], css_styles()),
+    ]),
+    html.body([], [content]),
+  ])
+}
+
+fn css_styles() -> String {
+  "
     * {
       margin: 0;
       padding: 0;
@@ -113,12 +124,5 @@ pub fn render(title: String, content: String) -> String {
         font-size: 1.5rem;
       }
     }
-  </style>
-</head>
-<body>
-"
-  <> content
-  <> "
-</body>
-</html>"
+  "
 }
