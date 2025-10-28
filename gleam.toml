@@ -33,3 +33,6 @@ squirrel = ">= 4.4.1 and < 5.0.0"
 gleeunit = ">= 1.0.0 and < 2.0.0"
 # Database Migrations
 cigogne = ">= 5.0.3 and < 6.0.0"
+simplifile = ">= 2.0.0 and < 3.0.0"
+shellout = ">= 1.7.0 and < 2.0.0"
+argv = ">= 1.0.2 and < 2.0.0"
