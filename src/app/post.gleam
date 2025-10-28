@@ -1,6 +1,7 @@
 import cake/adapter/postgres
 import cake/select as s
 import cake/where as w
+import cake_knife/offset
 import gleam/dynamic/decode
 import gleam/option.{type Option}
 import gleam/result
@@ -167,8 +168,90 @@ pub fn get_published_by_blog_id(
         w.is_true(w.col("published")),
       ]),
     )
+    |> s.order_by_desc("published_at")
     |> s.to_query
 
   postgres.run_read_query(query, decoder(), db)
   |> result.map_error(DatabaseError)
+}
+
+pub fn get_published_by_blog_id_paginated(
+  db: pog.Connection,
+  blog_id: String,
+  page: Int,
+  per_page: Int,
+) -> Result(offset.Page(Post), PostError) {
+  use total_count <- result.try(count_published_by_blog_id(db, blog_id))
+
+  let query =
+    s.new()
+    |> s.from_table("posts")
+    |> s.selects([
+      s.col("id::text"),
+      s.col("title"),
+      s.col("body_markdown"),
+      s.col("slug"),
+      s.col("meta_description"),
+      s.col("published"),
+      s.col("published_at::text"),
+      s.col("featured"),
+      s.col("author_id::text"),
+      s.col("blog_config_id::text"),
+      s.col("has_mermaid_diagrams"),
+      s.col("created_at::text"),
+      s.col("updated_at::text"),
+    ])
+    |> s.where(
+      w.and([
+        w.eq(w.col("blog_config_id::uuid"), w.string(blog_id)),
+        w.is_true(w.col("published")),
+      ]),
+    )
+    |> s.order_by_desc("published_at")
+    |> s.to_query
+    |> offset.page(page: page, per_page: per_page)
+
+  use posts <- result.try(
+    postgres.run_read_query(query, decoder(), db)
+    |> result.map_error(DatabaseError),
+  )
+
+  Ok(offset.new_page(
+    data: posts,
+    page: page,
+    per_page: per_page,
+    total_count: total_count,
+  ))
+}
+
+pub fn count_published_by_blog_id(
+  db: pog.Connection,
+  blog_id: String,
+) -> Result(Int, PostError) {
+  let count_decoder = {
+    use count <- decode.field(0, decode.int)
+    decode.success(count)
+  }
+
+  let query =
+    s.new()
+    |> s.from_table("posts")
+    |> s.select(s.col("COUNT(*)::int"))
+    |> s.where(
+      w.and([
+        w.eq(w.col("blog_config_id::uuid"), w.string(blog_id)),
+        w.is_true(w.col("published")),
+      ]),
+    )
+    |> s.to_query
+
+  use results <- result.try(
+    postgres.run_read_query(query, count_decoder, db)
+    |> result.map_error(DatabaseError),
+  )
+
+  case results {
+    [count, ..] -> Ok(count)
+    [] -> Ok(0)
+  }
 }

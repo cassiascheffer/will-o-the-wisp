@@ -1,5 +1,6 @@
 import app/blog.{type Blog}
 import app/post.{type Post}
+import cake_knife/offset
 import gleam/result
 import pog
 
@@ -67,6 +68,39 @@ pub fn fetch_blog_with_posts_by_subdomain(
   )
 
   Ok(BlogWithPosts(blog: found_blog, posts: posts))
+}
+
+pub type BlogWithPostsPage {
+  BlogWithPostsPage(blog: Blog, posts_page: offset.Page(Post))
+}
+
+pub fn fetch_blog_with_posts_page_by_subdomain(
+  db: pog.Connection,
+  subdomain: String,
+  page: Int,
+  per_page: Int,
+) -> Result(BlogWithPostsPage, BlogWithPostsError) {
+  use found_blog <- result.try(
+    blog.get_by_subdomain(db, subdomain)
+    |> result.map_error(fn(err) {
+      case err {
+        blog.NotFound -> BlogNotFound
+        blog.DatabaseError(db_error) -> BlogDatabaseError(db_error)
+      }
+    }),
+  )
+
+  use posts_page <- result.try(
+    post.get_published_by_blog_id_paginated(db, found_blog.id, page, per_page)
+    |> result.map_error(fn(err) {
+      case err {
+        post.NotFound -> PostDatabaseError(pog.ConnectionUnavailable)
+        post.DatabaseError(db_error) -> PostDatabaseError(db_error)
+      }
+    }),
+  )
+
+  Ok(BlogWithPostsPage(blog: found_blog, posts_page: posts_page))
 }
 
 // ---- Post with Blog ----

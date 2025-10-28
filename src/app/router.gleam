@@ -7,6 +7,9 @@ import app/views/layout
 import app/views/post_view
 import gleam/http
 import gleam/http/request
+import gleam/int
+import gleam/list
+import gleam/result
 import lustre/element
 import wisp.{type Request, type Response}
 
@@ -32,11 +35,38 @@ pub fn handle_request(req: Request, ctx: Context) -> Response {
 fn handle_blog_index(req: Request, ctx: Context, subdomain: String) -> Response {
   use <- wisp.require_method(req, http.Get)
 
-  case queries.fetch_blog_with_posts_by_subdomain(ctx.db, subdomain) {
+  let page =
+    request.get_query(req)
+    |> result.try(fn(query_params) {
+      list.key_find(query_params, "page")
+    })
+    |> result.try(int.parse)
+    |> result.unwrap(1)
+
+  let page = case page < 1 {
+    True -> 1
+    False -> page
+  }
+
+  let per_page = 10
+
+  case
+    queries.fetch_blog_with_posts_page_by_subdomain(
+      ctx.db,
+      subdomain,
+      page,
+      per_page,
+    )
+  {
     Ok(data) -> {
-      let content = blog_view.render_blog_index(data.blog, data.posts)
-      let page = layout.render(data.blog.title, content)
-      let html = element.to_string(page)
+      let content =
+        blog_view.render_blog_index_with_pagination(
+          data.blog,
+          data.posts_page,
+        )
+      let page_title = data.blog.title
+      let page_html = layout.render(page_title, content)
+      let html = element.to_string(page_html)
       wisp.html_response(html, 200)
     }
     Error(queries.BlogNotFound) -> wisp.not_found()
