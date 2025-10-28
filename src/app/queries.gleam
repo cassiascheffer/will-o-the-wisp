@@ -1,5 +1,3 @@
-// ABOUTME: Cross-domain queries that compose multiple domain entities
-// ABOUTME: Handles fetching blogs with posts and posts with blogs
 import app/blog.{type Blog}
 import app/post.{type Post}
 import gleam/result

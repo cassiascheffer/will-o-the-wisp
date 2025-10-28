@@ -1,5 +1,3 @@
-// ABOUTME: Root site HTTP handlers
-// ABOUTME: Handles requests to the main site (non-blog requests)
 import gleam/http
 import wisp.{type Request, type Response}
 

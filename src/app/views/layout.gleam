@@ -1,5 +1,3 @@
-// ABOUTME: Provides the main HTML layout structure for all pages
-// ABOUTME: Handles rendering the full HTML document with head and body elements
 
 import lustre/attribute
 import lustre/element.{type Element}

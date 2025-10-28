@@ -1,5 +1,3 @@
-// ABOUTME: Renders blog homepage with list of posts
-// ABOUTME: Displays blog title and published posts
 import app/blog.{type Blog}
 import app/post.{type Post}
 import gleam/list

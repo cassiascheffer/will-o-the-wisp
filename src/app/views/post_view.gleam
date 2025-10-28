@@ -1,5 +1,3 @@
-// ABOUTME: Renders individual blog post pages
-// ABOUTME: Displays post title, metadata, and body content
 import app/blog.{type Blog}
 import app/post.{type Post}
 import gleam/option.{None, Some}
